@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tic-Tac-Toe vs Computer</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #43cea2, #185a9d);
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 0;
+    }
+
+    .container {
+      text-align: center;
+      background: rgba(255, 255, 255, 0.9);
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    h1 {
+      margin-bottom: 20px;
+      color: #333;
+    }
+
+    .board {
+      display: grid;
+      grid-template-columns: repeat(3, 100px);
+      grid-template-rows: repeat(3, 100px);
+      gap: 8px;
+      justify-content: center;
+      margin: 20px auto;
+    }
+
+    .cell {
+      width: 100px;
+      height: 100px;
+      font-size: 2.5rem;
+      font-weight: bold;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: #fff;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .cell:hover {
+      background: #f1f1f1;
+    }
+
+    .status {
+      font-size: 1.2rem;
+      margin-bottom: 15px;
+      font-weight: bold;
+      color: #444;
+    }
+
+    .btn {
+      padding: 10px 20px;
+      font-size: 1rem;
+      font-weight: bold;
+      background: #4caf50;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .btn:hover {
+      background: #43a047;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🤖 Tic-Tac-Toe</h1>
+    <div class="status" id="status">Your Turn (X)</div>
+    <div class="board" id="board">
+      <div class="cell" data-index="0"></div>
+      <div class="cell" data-index="1"></div>
+      <div class="cell" data-index="2"></div>
+      <div class="cell" data-index="3"></div>
+      <div class="cell" data-index="4"></div>
+      <div class="cell" data-index="5"></div>
+      <div class="cell" data-index="6"></div>
+      <div class="cell" data-index="7"></div>
+      <div class="cell" data-index="8"></div>
+    </div>
+    <button class="btn" onclick="resetGame()">Restart Game</button>
+  </div>
+
+  <script>
+    const statusText = document.getElementById("status");
+    let cells = document.querySelectorAll(".cell");
+    let gameState = ["", "", "", "", "", "", "", "", ""];
+    let gameActive = true;
+    let currentPlayer = "X"; // Player always starts
+
+    const winningConditions = [
+      [0, 1, 2],
+      [3, 4, 5],
+      [6, 7, 8],
+      [0, 3, 6],
+      [1, 4, 7],
+      [2, 5, 8],
+      [0, 4, 8],
+      [2, 4, 6]
+    ];
+
+    function checkWinner() {
+      for (let condition of winningConditions) {
+        const [a, b, c] = condition;
+        if (gameState[a] && gameState[a] === gameState[b] && gameState[a] === gameState[c]) {
+          return gameState[a]; // return winner "X" or "O"
+        }
+      }
+      if (!gameState.includes("")) return "draw";
+      return null;
+    }
+
+    function makeMove(index, player) {
+      gameState[index] = player;
+      cells[index].textContent = player;
+    }
+
+    function playerMove(event) {
+      const index = event.target.getAttribute("data-index");
+
+      if (gameState[index] !== "" || !gameActive || currentPlayer !== "X") return;
+
+      makeMove(index, "X");
+      let result = checkWinner();
+
+      if (result) return endGame(result);
+
+      currentPlayer = "O";
+      statusText.textContent = "Computer's Turn (O)";
+
+      setTimeout(computerMove, 500); // computer plays after delay
+    }
+
+    function computerMove() {
+      let emptyCells = gameState.map((val, i) => (val === "" ? i : null)).filter(v => v !== null);
+      if (emptyCells.length === 0) return;
+
+      let randomIndex = emptyCells[Math.floor(Math.random() * emptyCells.length)];
+      makeMove(randomIndex, "O");
+
+      let result = checkWinner();
+      if (result) return endGame(result);
+
+      currentPlayer = "X";
+      statusText.textContent = "Your Turn (X)";
+    }
+
+    function endGame(result) {
+      gameActive = false;
+      if (result === "draw") {
+        statusText.textContent = "🤝 It's a Draw!";
+      } else if (result === "X") {
+        statusText.textContent = "🎉 You Win!";
+      } else {
+        statusText.textContent = "💻 Computer Wins!";
+      }
+    }
+
+    function resetGame() {
+      gameState = ["", "", "", "", "", "", "", "", ""];
+      gameActive = true;
+      currentPlayer = "X";
+      statusText.textContent = "Your Turn (X)";
+      cells.forEach(cell => cell.textContent = "");
+    }
+
+    cells.forEach(cell => cell.addEventListener("click", playerMove));
+    document.addEventListener("DOMContentLoaded", () => {
+});
+
+  </script>
+</body>
+</html>
